@@ -1,8 +1,10 @@
+
 import 'package:flutter/material.dart';
 
-import 'screens/map_screen.dart';
+import 'screens/menu_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const UespiOfThrones());
 }
 
@@ -12,18 +14,15 @@ class UespiOfThrones extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-
       title: 'UESPI of Thrones',
-
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.deepPurple,
         ),
         useMaterial3: true,
       ),
-
-      home: const MapScreen(),
+      home: const MenuScreen(),
     );
   }
 }

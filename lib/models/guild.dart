@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -17,9 +16,7 @@ class GuildAttributes {
        assert(exatas >= 1 && exatas <= 7),
        assert(natureza >= 1 && natureza <= 7),
        assert(humanas >= 1 && humanas <= 7),
-       assert(
-         literatura + exatas + natureza + humanas == 18,
-       );
+       assert(literatura + exatas + natureza + humanas == 18);
 }
 
 class Guild {

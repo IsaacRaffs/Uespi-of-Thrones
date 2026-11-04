@@ -6,11 +6,7 @@ class GuildMarker extends StatelessWidget {
   final Guild guild;
   final VoidCallback onTap;
 
-  const GuildMarker({
-    super.key,
-    required this.guild,
-    required this.onTap,
-  });
+  const GuildMarker({super.key, required this.guild, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -24,35 +20,20 @@ class GuildMarker extends StatelessWidget {
             decoration: BoxDecoration(
               color: guild.color,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 3,
-              ),
+              border: Border.all(color: Colors.white, width: 3),
               boxShadow: const [
-                BoxShadow(
-                  blurRadius: 5,
-                  color: Colors.black54,
-                ),
+                BoxShadow(blurRadius: 5, color: Colors.black54),
               ],
             ),
-            child: const Icon(
-              Icons.castle,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.castle, color: Colors.white),
           ),
 
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 5,
-              vertical: 2,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
             color: Colors.black87,
             child: Text(
               guild.name,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 10),
             ),
           ),
         ],

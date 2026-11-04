@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import 'screens/menu_screen.dart';
@@ -17,9 +16,7 @@ class UespiOfThrones extends StatelessWidget {
       title: 'UESPI of Thrones',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const MenuScreen(),

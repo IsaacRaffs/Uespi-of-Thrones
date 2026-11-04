@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../data/guild_data.dart';
@@ -6,6 +5,7 @@ import '../models/game_save.dart';
 import '../services/save_service.dart';
 import 'course_selection_screen.dart';
 import 'map_screen.dart';
+import 'game_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -33,9 +33,8 @@ class _MenuScreenState extends State<MenuScreen> {
       setState(() => saves = result);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao ler saves: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Erro ao ler saves: $e')));
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -59,16 +58,15 @@ class _MenuScreenState extends State<MenuScreen> {
               ...List.generate(3, (index) {
                 final slot = index + 1;
                 final game = saves[index];
-                final enabled = newGame
-                    ? game == null
-                    : game != null;
+                final enabled = newGame ? game == null : game != null;
 
                 final guildName = game == null
                     ? 'Slot vazio'
                     : guilds
-                        .where((g) => g.id == game.guildId)
-                        .map((g) => g.name)
-                        .firstOrNull ?? 'Curso desconhecido';
+                              .where((g) => g.id == game.guildId)
+                              .map((g) => g.name)
+                              .firstOrNull ??
+                          'Curso desconhecido';
 
                 return Card(
                   child: ListTile(
@@ -77,9 +75,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     title: Text('Save $slot'),
                     subtitle: Text(guildName),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: enabled
-                        ? () => Navigator.pop(context, slot)
-                        : null,
+                    onTap: enabled ? () => Navigator.pop(context, slot) : null,
                   ),
                 );
               }),
@@ -95,11 +91,7 @@ class _MenuScreenState extends State<MenuScreen> {
     if (newGame) {
       await Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => CourseSelectionScreen(
-            slot: chosen,
-          ),
-        ),
+        MaterialPageRoute(builder: (_) => CourseSelectionScreen(slot: chosen)),
       );
     } else {
       final game = await SaveService.instance.load(chosen);
@@ -107,9 +99,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
       await Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => MapScreen(gameSave: game),
-        ),
+        MaterialPageRoute(builder: (_) => GameScreen(gameSave: game)),
       );
     }
 
@@ -129,11 +119,7 @@ class _MenuScreenState extends State<MenuScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.castle,
-                  size: 110,
-                  color: Colors.amber,
-                ),
+                const Icon(Icons.castle, size: 110, color: Colors.amber),
                 const SizedBox(height: 24),
                 const Text(
                   'UESPI OF THRONES',

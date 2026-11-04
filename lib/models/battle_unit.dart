@@ -26,12 +26,10 @@ class BattleUnit {
 
   LatLng get currentPosition {
     final latitude =
-        start.latitude +
-        (destination.latitude - start.latitude) * progress;
+        start.latitude + (destination.latitude - start.latitude) * progress;
 
     final longitude =
-        start.longitude +
-        (destination.longitude - start.longitude) * progress;
+        start.longitude + (destination.longitude - start.longitude) * progress;
 
     return LatLng(latitude, longitude);
   }

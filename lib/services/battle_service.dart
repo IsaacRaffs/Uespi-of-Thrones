@@ -28,36 +28,30 @@ class BattleService {
     }
   }
 
-  void start({
-    required void Function() onUpdate,
-    required List<Guild> guilds,
-  }) {
-    Timer.periodic(
-      const Duration(milliseconds: 50),
-      (_) {
-        final arrivedUnits = <BattleUnit>[];
+  void start({required void Function() onUpdate, required List<Guild> guilds}) {
+    Timer.periodic(const Duration(milliseconds: 50), (_) {
+      final arrivedUnits = <BattleUnit>[];
 
-        for (final unit in units) {
-          unit.progress += 0.004;
+      for (final unit in units) {
+        unit.progress += 0.004;
 
-          if (unit.progress >= 1) {
-            unit.progress = 1;
-            arrivedUnits.add(unit);
-          }
+        if (unit.progress >= 1) {
+          unit.progress = 1;
+          arrivedUnits.add(unit);
         }
+      }
 
-        for (final unit in arrivedUnits) {
-          final target = guilds.firstWhere(
-            (guild) => guild.id == unit.targetGuildId,
-          );
+      for (final unit in arrivedUnits) {
+        final target = guilds.firstWhere(
+          (guild) => guild.id == unit.targetGuildId,
+        );
 
-          target.health -= 10;
+        target.health -= 10;
 
-          units.remove(unit);
-        }
+        units.remove(unit);
+      }
 
-        onUpdate();
-      },
-    );
+      onUpdate();
+    });
   }
 }

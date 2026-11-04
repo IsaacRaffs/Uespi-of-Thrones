@@ -1,44 +1,32 @@
-
 import 'package:flutter/material.dart';
 
 import '../data/guild_data.dart';
 import '../models/guild.dart';
 import '../services/save_service.dart';
 import 'map_screen.dart';
+import 'game_screen.dart';
 
 class CourseSelectionScreen extends StatefulWidget {
   final int slot;
 
-  const CourseSelectionScreen({
-    super.key,
-    required this.slot,
-  });
+  const CourseSelectionScreen({super.key, required this.slot});
 
   @override
-  State<CourseSelectionScreen> createState() =>
-      _CourseSelectionScreenState();
+  State<CourseSelectionScreen> createState() => _CourseSelectionScreenState();
 }
 
-class _CourseSelectionScreenState
-    extends State<CourseSelectionScreen> {
+class _CourseSelectionScreenState extends State<CourseSelectionScreen> {
   Guild? selectedGuild;
   bool creating = false;
 
-  Widget attributeBar(
-    String name,
-    int value,
-    Color color,
-  ) {
+  Widget attributeBar(String name, int value, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
           SizedBox(
             width: 80,
-            child: Text(
-              name,
-              style: const TextStyle(fontSize: 12),
-            ),
+            child: Text(name, style: const TextStyle(fontSize: 12)),
           ),
           Expanded(
             child: LinearProgressIndicator(
@@ -83,11 +71,7 @@ class _CourseSelectionScreenState
                   CircleAvatar(
                     radius: 27,
                     backgroundColor: guild.color,
-                    child: Icon(
-                      guild.icon,
-                      color: Colors.white,
-                      size: 29,
-                    ),
+                    child: Icon(guild.icon, color: Colors.white, size: 29),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -99,11 +83,7 @@ class _CourseSelectionScreenState
                       ),
                     ),
                   ),
-                  if (selected)
-                    Icon(
-                      Icons.check_circle,
-                      color: guild.color,
-                    ),
+                  if (selected) Icon(Icons.check_circle, color: guild.color),
                 ],
               ),
               const SizedBox(height: 10),
@@ -114,21 +94,9 @@ class _CourseSelectionScreenState
                 guild.attributes.literatura,
                 Colors.purple,
               ),
-              attributeBar(
-                'Exatas',
-                guild.attributes.exatas,
-                Colors.blue,
-              ),
-              attributeBar(
-                'Natureza',
-                guild.attributes.natureza,
-                Colors.green,
-              ),
-              attributeBar(
-                'Humanas',
-                guild.attributes.humanas,
-                Colors.orange,
-              ),
+              attributeBar('Exatas', guild.attributes.exatas, Colors.blue),
+              attributeBar('Natureza', guild.attributes.natureza, Colors.green),
+              attributeBar('Humanas', guild.attributes.humanas, Colors.orange),
             ],
           ),
         ),
@@ -146,22 +114,23 @@ class _CourseSelectionScreenState
       final game = await SaveService.instance.create(
         widget.slot,
         guild.id,
+        literatura: guild.attributes.literatura,
+        exatas: guild.attributes.exatas,
+        natureza: guild.attributes.natureza,
+        humanas: guild.attributes.humanas,
       );
 
       if (!mounted) return;
 
       await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => MapScreen(gameSave: game),
-        ),
+        MaterialPageRoute(builder: (_) => GameScreen(gameSave: game)),
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao criar jogo: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Erro ao criar jogo: $e')));
       setState(() => creating = false);
     }
   }
@@ -169,9 +138,7 @@ class _CourseSelectionScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Escolha seu curso — Save ${widget.slot}'),
-      ),
+      appBar: AppBar(title: Text('Escolha seu curso — Save ${widget.slot}')),
       body: ListView.builder(
         padding: const EdgeInsets.all(12),
         itemCount: guilds.length,
@@ -183,15 +150,9 @@ class _CourseSelectionScreenState
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: ElevatedButton.icon(
-            onPressed: selectedGuild == null || creating
-                ? null
-                : startGame,
+            onPressed: selectedGuild == null || creating ? null : startGame,
             icon: const Icon(Icons.sports_esports),
-            label: Text(
-              creating
-                  ? 'CRIANDO PARTIDA...'
-                  : 'INICIAR JOGO',
-            ),
+            label: Text(creating ? 'CRIANDO PARTIDA...' : 'INICIAR JOGO'),
           ),
         ),
       ),

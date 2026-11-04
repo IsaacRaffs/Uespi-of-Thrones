@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,8 +9,7 @@ class SaveService {
 
   SaveService._();
 
-  final SharedPreferencesAsync _prefs =
-      SharedPreferencesAsync();
+  final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
 
   String _key(int slot) => 'uespi_save_$slot';
 
@@ -28,37 +26,30 @@ class SaveService {
     if (raw == null) return null;
 
     try {
-      return GameSave.fromJson(
-        jsonDecode(raw) as Map<String, dynamic>,
-      );
+      return GameSave.fromJson(jsonDecode(raw) as Map<String, dynamic>);
     } catch (_) {
-      throw FormatException(
-        'Save $slot está corrompido.',
-      );
+      throw FormatException('Save $slot está corrompido.');
     }
   }
 
   Future<List<GameSave?>> loadAll() async {
-    return Future.wait([
-      load(1),
-      load(2),
-      load(3),
-    ]);
+    return Future.wait([load(1), load(2), load(3)]);
   }
 
   Future<void> save(GameSave game) async {
     _validateSlot(game.slot);
 
-    await _prefs.setString(
-      _key(game.slot),
-      jsonEncode(game.toJson()),
-    );
+    await _prefs.setString(_key(game.slot), jsonEncode(game.toJson()));
   }
 
   Future<GameSave> create(
     int slot,
-    String guildId,
-  ) async {
+    String guildId, {
+    required int literatura,
+    required int exatas,
+    required int natureza,
+    required int humanas,
+  }) async {
     _validateSlot(slot);
 
     if (await load(slot) != null) {
@@ -72,9 +63,16 @@ class SaveService {
       guildId: guildId,
       createdAt: now,
       updatedAt: now,
+      level: 1,
+      experience: 0,
+      literatura: literatura,
+      exatas: exatas,
+      natureza: natureza,
+      humanas: humanas,
     );
 
     await save(game);
+
     return game;
   }
 

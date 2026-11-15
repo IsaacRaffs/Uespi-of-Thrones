@@ -12,11 +12,10 @@ class GuildAttributes {
     required this.exatas,
     required this.natureza,
     required this.humanas,
-  }) : assert(literatura >= 1 && literatura <= 7),
-       assert(exatas >= 1 && exatas <= 7),
-       assert(natureza >= 1 && natureza <= 7),
-       assert(humanas >= 1 && humanas <= 7),
-       assert(literatura + exatas + natureza + humanas == 18);
+  }) : assert(literatura >= 0 && literatura <= 100),
+       assert(exatas >= 0 && exatas <= 100),
+       assert(natureza >= 0 && natureza <= 100),
+       assert(humanas >= 0 && humanas <= 100);
 }
 
 class Guild {
@@ -30,8 +29,6 @@ class Guild {
 
   int coins;
   int books;
-  int bookshelves;
-  int shoes;
   int health;
 
   Guild({
@@ -44,8 +41,6 @@ class Guild {
     required this.attributes,
     this.coins = 0,
     this.books = 0,
-    this.bookshelves = 0,
-    this.shoes = 0,
     this.health = 1000,
   });
 

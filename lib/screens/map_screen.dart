@@ -7,14 +7,20 @@ import 'package:latlong2/latlong.dart';
 import '../data/guild_data.dart';
 import '../models/game_save.dart';
 import '../models/guild.dart';
-import '../services/opponent_service.dart';
 import '../models/battle_unit.dart';
 import '../widgets/battle_ball.dart';
 import '../widgets/guild_marker.dart';
+import '../widgets/medieval_guild_marker.dart';
+import 'battle_quiz_screen.dart';
+import '../data/course_questions.dart';
+import '../services/opponent_service.dart';
+
+import '../services/audio_service.dart';
+import '../widgets/guild_crest.dart';
 
 class MapScreen extends StatefulWidget {
   final GameSave gameSave;
-  final VoidCallback onChanged;
+  final Future<void> Function() onChanged;
 
   const MapScreen({super.key, required this.gameSave, required this.onChanged});
 
@@ -71,63 +77,122 @@ class _MapScreenState extends State<MapScreen> {
 
   void showGuild(Guild target) {
     final targetLevel = getTargetLevel(target);
-
     final isDefeated = save.defeatedGuildIds.contains(target.id);
-
-    final next = nextOpponent;
-
-    final isNext = next?.id == target.id;
+    final isNext = nextOpponent?.id == target.id;
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(22),
+        return Container(
+          padding: const EdgeInsets.fromLTRB(22, 24, 22, 30),
+          decoration: const BoxDecoration(
+            color: Color(0xFF30251F),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+            border: Border(top: BorderSide(color: Color(0xFFD6AD55), width: 3)),
+          ),
+          child: SafeArea(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: target.color,
-                      child: Icon(target.icon, color: Colors.white),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        target.name,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                Container(
+                  width: 45,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD6AD55),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
 
-                const SizedBox(height: 14),
+                const SizedBox(height: 20),
 
-                Text('Nível da guilda: $targetLevel'),
-                Text('Seu nível: ${save.level}'),
+                Container(
+                  width: 82,
+                  height: 82,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF211B19),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFFD6AD55),
+                      width: 3,
+                    ),
+                  ),
+                  child: GuildCrest(
+                    guildId: target.id,
+                    size: 78,
+                    fallbackIcon: target.icon,
+                    fallbackColor: const Color(0xFFD6AD55),
+                    framed: false,
+                  ),
+                ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 13),
+
+                Text(
+                  target.name.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFFF1DEB5),
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                Text(
+                  target.description,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white60, fontSize: 12),
+                ),
+
+                const SizedBox(height: 20),
+
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8D2A5),
+                    border: Border.all(
+                      color: const Color(0xFFD6AD55),
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _battleLevel('SUA GUILDA', save.level, Icons.castle),
+                      const Icon(
+                        Icons.sports_martial_arts,
+                        color: Color(0xFF79451E),
+                        size: 29,
+                      ),
+                      _battleLevel('ADVERSÁRIA', targetLevel, Icons.shield),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 17),
 
                 if (isDefeated)
-                  const Text(
-                    'Guilda conquistada!',
-                    style: TextStyle(color: Colors.green),
+                  _battleMessage(
+                    'TERRITÓRIO CONQUISTADO',
+                    'Esta fortaleza já está sob seu domínio.',
+                    const Color(0xFF527D49),
                   )
                 else if (!isNext)
-                  const Text(
-                    'Esta guilda ainda não está disponível. '
-                    'Derrote a guilda anterior primeiro.',
+                  _battleMessage(
+                    'TERRITÓRIO BLOQUEADO',
+                    'Derrote a fortaleza anterior para avançar.',
+                    const Color(0xFF922F2F),
                   )
                 else
-                  const Text(
-                    'Esta é sua próxima adversária!',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  _battleMessage(
+                    'PRÓXIMO ALVO',
+                    'Prepare suas tropas para conquistar esta fortaleza.',
+                    const Color(0xFF936B29),
                   ),
 
                 const SizedBox(height: 18),
@@ -135,17 +200,37 @@ class _MapScreenState extends State<MapScreen> {
                 if (isNext && !isDefeated)
                   SizedBox(
                     width: double.infinity,
+                    height: 53,
                     child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF8B2929),
+                        foregroundColor: const Color(0xFFFFE7B5),
+                        side: const BorderSide(
+                          color: Color(0xFFD6AD55),
+                          width: 2,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                       onPressed: battling
                           ? null
                           : () {
                               Navigator.pop(context);
                               startBattle(target);
                             },
-                      icon: const Icon(Icons.sports_martial_arts),
-                      label: const Text('INICIAR BATALHA'),
+                      icon: const Icon(Icons.gavel),
+                      label: const Text(
+                        'DECLARAR GUERRA',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1,
+                        ),
+                      ),
                     ),
                   ),
+
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -154,53 +239,138 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void startBattle(Guild target) {
+  Widget _battleLevel(String label, int level, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: const Color(0xFF79451E), size: 28),
+        const SizedBox(height: 5),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF79451E),
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          'NÍVEL $level',
+          style: const TextStyle(
+            color: Color(0xFF352619),
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _battleMessage(String title, String message, Color color) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.17),
+        border: Border.all(color: color),
+        borderRadius: BorderRadius.circular(7),
+      ),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xFFF1DEB5), fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> startBattle(Guild target) async {
     if (battling) return;
 
-    if (save.level < getTargetLevel(target)) {
-      showDefeat(target);
+    final next = nextOpponent;
+
+    if (next == null || next.id != target.id) {
+      return;
+    }
+
+    final questions = courseQuestions[target.id];
+
+    if (questions == null || questions.length != 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível carregar as perguntas desta guilda.'),
+        ),
+      );
       return;
     }
 
     setState(() {
       battling = true;
       currentTarget = target;
-      units.clear();
     });
 
-    for (int i = 0; i < 15; i++) {
-      units.add(
-        BattleUnit(
-          id: '${DateTime.now().microsecondsSinceEpoch}-$i',
-          attackerGuildId: playerGuild.id,
-          targetGuildId: target.id,
-          start: playerGuild.location,
-          destination: target.location,
-          color: playerGuild.color,
-          progress: -(i * 0.035),
+    final victory = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BattleQuizScreen(
+          playerGuildId: playerGuild.id,
+          opponentGuildId: target.id,
+          opponentName: target.name,
+          questions: questions,
         ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      battling = false;
+      currentTarget = null;
+    });
+
+    if (victory == true) {
+      if (!save.defeatedGuildIds.contains(target.id)) {
+        save.defeatedGuildIds.add(target.id);
+        save.coins += 100 * getTargetLevel(target);
+      }
+
+      await widget.onChanged();
+
+      if (!mounted) return;
+
+      showResult(
+        title: 'VITÓRIA!',
+        message:
+            'Você conquistou ${target.name}!\n\n'
+            'Você acertou pelo menos duas perguntas.\n'
+            'Recompensa: ${100 * getTargetLevel(target)} coins.\n\n'
+            'A próxima guilda já está disponível!',
+        victory: true,
+      );
+    } else if (victory == false) {
+      showResult(
+        title: 'DERROTA!',
+        message:
+            'Você não conseguiu conquistar ${target.name}.\n\n'
+            'É necessário acertar pelo menos duas das três perguntas.\n\n'
+            'Treine e tente novamente!',
+        victory: false,
       );
     }
 
-    battleTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-
-      for (final unit in units) {
-        unit.progress += 0.012;
-      }
-
-      units.removeWhere((unit) => unit.progress >= 1);
-
+    if (mounted) {
       setState(() {});
-
-      if (units.isEmpty) {
-        timer.cancel();
-        finishBattle(target);
-      }
-    });
+    }
   }
 
   void finishBattle(Guild target) {
@@ -259,15 +429,114 @@ class _MapScreenState extends State<MapScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('VOLTAR AO JOGO'),
+        final accent = victory
+            ? const Color(0xFFD6AD55)
+            : const Color(0xFFB94B45);
+
+        return Dialog(
+          backgroundColor: const Color(0xFF30251F),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: accent, width: 3),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(23),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  victory ? Icons.emoji_events : Icons.shield,
+                  size: 75,
+                  color: accent,
+                ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: accent,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+
+                const Divider(color: Color(0xFF80633C), height: 25),
+
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFFF1DEB5),
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+
+                if (victory) ...[
+                  const SizedBox(height: 18),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(13),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8D2A5),
+                      border: Border.all(
+                        color: const Color(0xFFD6AD55),
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    child: const Column(
+                      children: [
+                        Icon(
+                          Icons.inventory_2,
+                          color: Color(0xFF79451E),
+                          size: 30,
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'TESOURO CONQUISTADO',
+                          style: TextStyle(
+                            color: Color(0xFF352619),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 22),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accent,
+                      foregroundColor: const Color(0xFF30251F),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      victory
+                          ? 'CONTINUAR CONQUISTANDO'
+                          : 'RETORNAR À FORTALEZA',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -283,14 +552,39 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mapa de Teresina'),
+        backgroundColor: const Color(0xFF30251C),
+        foregroundColor: const Color(0xFFF1DEB5),
+        elevation: 5,
+        title: const Row(
+          children: [
+            Icon(Icons.castle, color: Color(0xFFD6AD55)),
+            SizedBox(width: 10),
+            Text(
+              'REINO DE TERESINA',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
         actions: [
           Padding(
-            padding: const EdgeInsets.all(8),
-            child: Center(child: Text('Nível ${save.level}')),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Center(
+              child: Text(
+                'LV. ${save.level}',
+                style: const TextStyle(
+                  color: Color(0xFFD6AD55),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
         ],
       ),
+
       body: Stack(
         children: [
           FlutterMap(
@@ -301,9 +595,24 @@ class _MapScreenState extends State<MapScreen> {
               maxZoom: 18,
             ),
             children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'br.uespi.uespi_of_thrones',
+              ColorFiltered(
+                colorFilter: const ColorFilter.matrix([
+                  // Vermelho
+                  0.70, 0.38, 0.09, 0, 0,
+
+                  // Verde
+                  0.17, 0.84, 0.08, 0, 0,
+
+                  // Azul
+                  0.14, 0.27, 0.57, 0, 0,
+
+                  // Transparência
+                  0, 0, 0, 1, 0,
+                ]),
+                child: TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'br.uespi.uespi_of_thrones',
+                ),
               ),
 
               PolylineLayer(
@@ -312,8 +621,8 @@ class _MapScreenState extends State<MapScreen> {
                     .map(
                       (unit) => Polyline(
                         points: [unit.start, unit.destination],
-                        color: unit.color.withValues(alpha: 0.25),
-                        strokeWidth: 2,
+                        color: const Color(0xFFC49A52).withValues(alpha: 0.65),
+                        strokeWidth: 3,
                       ),
                     )
                     .toList(),
@@ -325,16 +634,22 @@ class _MapScreenState extends State<MapScreen> {
 
                   final isPlayer = guild.id == playerGuild.id;
 
+                  final isNext = nextOpponent?.id == guild.id;
+
+                  final level = isPlayer ? save.level : getTargetLevel(guild);
+
                   return Marker(
                     point: guild.location,
-                    width: 120,
-                    height: 75,
-                    child: Opacity(
-                      opacity: defeated ? 0.55 : 1,
-                      child: GuildMarker(
-                        guild: guild,
-                        onTap: isPlayer ? () {} : () => showGuild(guild),
-                      ),
+                    width: 126,
+                    height: 105,
+                    alignment: Alignment.topCenter,
+                    child: MedievalGuildMarker(
+                      guild: guild,
+                      level: level,
+                      isPlayer: isPlayer,
+                      isDefeated: defeated,
+                      isNext: isNext,
+                      onTap: isPlayer ? () {} : () => showGuild(guild),
                     ),
                   );
                 }).toList(),
@@ -362,50 +677,228 @@ class _MapScreenState extends State<MapScreen> {
             ],
           ),
 
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Container(
+                margin: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFD6AD55).withValues(alpha: 0.65),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           if (nextOpponent != null)
             Positioned(
               left: 12,
               right: 12,
               top: 12,
-              child: Card(
-                child: ListTile(
-                  leading: const Icon(Icons.flag, color: Colors.amber),
-                  title: const Text(
-                    'PRÓXIMA CONQUISTA',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+              child: SafeArea(
+                bottom: false,
+                child: Container(
+                  padding: const EdgeInsets.all(13),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF30251C).withValues(alpha: 0.96),
+                    border: Border.all(
+                      color: const Color(0xFFD6AD55),
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black54,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  subtitle: Text(
-                    '${nextOpponent!.name} · '
-                    'Nível ${getTargetLevel(nextOpponent!)}',
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.flag,
+                        color: Color(0xFFD6AD55),
+                        size: 32,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'PRÓXIMA CONQUISTA',
+                              style: TextStyle(
+                                color: Color(0xFFD6AD55),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              nextOpponent!.name,
+                              style: const TextStyle(
+                                color: Color(0xFFF1DEB5),
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Fortaleza nível ${getTargetLevel(nextOpponent!)}',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => showGuild(nextOpponent!),
+                        icon: const Icon(
+                          Icons.sports_martial_arts,
+                          color: Color(0xFFD6AD55),
+                        ),
+                        tooltip: 'Ver adversário',
+                      ),
+                    ],
                   ),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => showGuild(nextOpponent!),
                 ),
               ),
             ),
 
           if (battling)
             Positioned(
-              bottom: 20,
-              left: 20,
-              right: 20,
-              child: Card(
-                color: Colors.black87,
-                child: Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: Text(
-                    '⚔️ Atacando ${currentTarget?.name}...',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+              left: 12,
+              right: 12,
+              bottom: 85,
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF30251F).withValues(alpha: 0.97),
+                  border: Border.all(color: const Color(0xFFD6AD55), width: 2),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
+                    BoxShadow(color: Colors.black54, blurRadius: 10),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.sports_martial_arts,
+                          color: Color(0xFFD6AD55),
+                        ),
+                        SizedBox(width: 9),
+                        Text(
+                          'BATALHA EM ANDAMENTO',
+                          style: TextStyle(
+                            color: Color(0xFFD6AD55),
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                    const SizedBox(height: 9),
+                    Text(
+                      'Suas tropas estão atacando ${currentTarget?.name ?? "a fortaleza"}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color(0xFFF1DEB5),
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const LinearProgressIndicator(
+                      backgroundColor: Color(0xFF604B34),
+                      color: Color(0xFFD6AD55),
+                      minHeight: 6,
+                    ),
+                  ],
                 ),
               ),
             ),
+
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 12,
+            child: SafeArea(
+              top: false,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 13,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF30251C).withValues(alpha: 0.96),
+                  border: Border.all(
+                    color: const Color(0xFFD6AD55),
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _MapLegendItem(
+                      icon: Icons.castle,
+                      label: 'Minha sede',
+                      color: Color(0xFFD6AD55),
+                    ),
+                    _MapLegendItem(
+                      icon: Icons.flag,
+                      label: 'Adversária',
+                      color: Color(0xFFBE4545),
+                    ),
+                    _MapLegendItem(
+                      icon: Icons.shield,
+                      label: 'Conquistada',
+                      color: Color(0xFF63A56D),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _MapLegendItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _MapLegendItem({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: color, size: 22),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFFF1DEB5),
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 }

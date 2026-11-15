@@ -3,6 +3,15 @@ import 'package:latlong2/latlong.dart';
 
 import '../models/guild.dart';
 
+/// Dados das guildas disponíveis no jogo.
+///
+/// Os atributos seguem a escala de 0 a 100:
+/// - literatura: Linguagens e comunicação
+/// - exatas: Matemática, lógica e raciocínio
+/// - natureza: Ciências da natureza
+/// - humanas: Ciências humanas e sociais
+///
+/// Os valores representam as especialidades de cada curso.
 final List<Guild> guilds = [
   Guild(
     id: 'psicologia',
@@ -12,12 +21,13 @@ final List<Guild> guilds = [
     color: Colors.purple,
     icon: Icons.psychology,
     attributes: const GuildAttributes(
-      literatura: 4,
-      exatas: 2,
-      natureza: 5,
-      humanas: 7,
+      literatura: 55,
+      exatas: 35,
+      natureza: 55,
+      humanas: 75,
     ),
   ),
+
   Guild(
     id: 'engenharia_civil',
     name: 'Engenharia Civil',
@@ -26,12 +36,13 @@ final List<Guild> guilds = [
     color: Colors.orange,
     icon: Icons.architecture,
     attributes: const GuildAttributes(
-      literatura: 2,
-      exatas: 7,
-      natureza: 6,
-      humanas: 3,
+      literatura: 35,
+      exatas: 75,
+      natureza: 65,
+      humanas: 45,
     ),
   ),
+
   Guild(
     id: 'engenharia_eletrica',
     name: 'Engenharia Elétrica',
@@ -40,12 +51,13 @@ final List<Guild> guilds = [
     color: Colors.amber,
     icon: Icons.bolt,
     attributes: const GuildAttributes(
-      literatura: 2,
-      exatas: 7,
-      natureza: 7,
-      humanas: 2,
+      literatura: 35,
+      exatas: 75,
+      natureza: 75,
+      humanas: 35,
     ),
   ),
+
   Guild(
     id: 'zootecnia',
     name: 'Zootecnia',
@@ -55,12 +67,13 @@ final List<Guild> guilds = [
     color: Colors.brown,
     icon: Icons.pets,
     attributes: const GuildAttributes(
-      literatura: 2,
-      exatas: 4,
-      natureza: 7,
-      humanas: 5,
+      literatura: 35,
+      exatas: 45,
+      natureza: 75,
+      humanas: 65,
     ),
   ),
+
   Guild(
     id: 'historia',
     name: 'História',
@@ -69,12 +82,13 @@ final List<Guild> guilds = [
     color: Colors.deepOrange,
     icon: Icons.history_edu,
     attributes: const GuildAttributes(
-      literatura: 6,
-      exatas: 1,
-      natureza: 4,
-      humanas: 7,
+      literatura: 75,
+      exatas: 30,
+      natureza: 45,
+      humanas: 70,
     ),
   ),
+
   Guild(
     id: 'medicina',
     name: 'Medicina',
@@ -84,12 +98,13 @@ final List<Guild> guilds = [
     color: Colors.red,
     icon: Icons.medical_services,
     attributes: const GuildAttributes(
-      literatura: 2,
-      exatas: 4,
-      natureza: 7,
-      humanas: 5,
+      literatura: 40,
+      exatas: 50,
+      natureza: 75,
+      humanas: 55,
     ),
   ),
+
   Guild(
     id: 'fisica',
     name: 'Física',
@@ -98,12 +113,13 @@ final List<Guild> guilds = [
     color: Colors.indigo,
     icon: Icons.science,
     attributes: const GuildAttributes(
-      literatura: 2,
-      exatas: 7,
-      natureza: 7,
-      humanas: 2,
+      literatura: 35,
+      exatas: 75,
+      natureza: 75,
+      humanas: 35,
     ),
   ),
+
   Guild(
     id: 'educacao_fisica',
     name: 'Educação Física',
@@ -113,12 +129,13 @@ final List<Guild> guilds = [
     color: Colors.green,
     icon: Icons.fitness_center,
     attributes: const GuildAttributes(
-      literatura: 2,
-      exatas: 3,
-      natureza: 7,
-      humanas: 6,
+      literatura: 35,
+      exatas: 40,
+      natureza: 75,
+      humanas: 70,
     ),
   ),
+
   Guild(
     id: 'computacao',
     name: 'Computação',
@@ -127,12 +144,13 @@ final List<Guild> guilds = [
     color: Colors.blue,
     icon: Icons.computer,
     attributes: const GuildAttributes(
-      literatura: 3,
-      exatas: 7,
-      natureza: 6,
-      humanas: 2,
+      literatura: 45,
+      exatas: 75,
+      natureza: 65,
+      humanas: 35,
     ),
   ),
+
   Guild(
     id: 'quimica',
     name: 'Química',
@@ -141,12 +159,13 @@ final List<Guild> guilds = [
     color: Colors.teal,
     icon: Icons.biotech,
     attributes: const GuildAttributes(
-      literatura: 2,
-      exatas: 7,
-      natureza: 7,
-      humanas: 2,
+      literatura: 35,
+      exatas: 70,
+      natureza: 75,
+      humanas: 40,
     ),
   ),
+
   Guild(
     id: 'letras',
     name: 'Letras',
@@ -155,12 +174,13 @@ final List<Guild> guilds = [
     color: Colors.pink,
     icon: Icons.menu_book,
     attributes: const GuildAttributes(
-      literatura: 7,
-      exatas: 2,
-      natureza: 2,
-      humanas: 7,
+      literatura: 75,
+      exatas: 35,
+      natureza: 35,
+      humanas: 75,
     ),
   ),
+
   Guild(
     id: 'biologia',
     name: 'Biologia',
@@ -169,12 +189,13 @@ final List<Guild> guilds = [
     color: Colors.lightGreen,
     icon: Icons.eco,
     attributes: const GuildAttributes(
-      literatura: 2,
-      exatas: 4,
-      natureza: 7,
-      humanas: 5,
+      literatura: 35,
+      exatas: 50,
+      natureza: 75,
+      humanas: 60,
     ),
   ),
+
   Guild(
     id: 'direito',
     name: 'Direito',
@@ -183,12 +204,13 @@ final List<Guild> guilds = [
     color: Colors.blueGrey,
     icon: Icons.gavel,
     attributes: const GuildAttributes(
-      literatura: 7,
-      exatas: 2,
-      natureza: 2,
-      humanas: 7,
+      literatura: 75,
+      exatas: 40,
+      natureza: 35,
+      humanas: 70,
     ),
   ),
+
   Guild(
     id: 'jornalismo',
     name: 'Jornalismo',
@@ -197,12 +219,13 @@ final List<Guild> guilds = [
     color: Colors.cyan,
     icon: Icons.campaign,
     attributes: const GuildAttributes(
-      literatura: 7,
-      exatas: 2,
-      natureza: 2,
-      humanas: 7,
+      literatura: 75,
+      exatas: 40,
+      natureza: 35,
+      humanas: 70,
     ),
   ),
+
   Guild(
     id: 'turismo',
     name: 'Turismo',
@@ -211,10 +234,10 @@ final List<Guild> guilds = [
     color: Colors.deepPurple,
     icon: Icons.travel_explore,
     attributes: const GuildAttributes(
-      literatura: 5,
-      exatas: 2,
-      natureza: 4,
-      humanas: 7,
+      literatura: 60,
+      exatas: 35,
+      natureza: 50,
+      humanas: 75,
     ),
   ),
 ];

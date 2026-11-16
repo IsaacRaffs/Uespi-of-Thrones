@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../services/audio_service.dart';
 import '../data/guild_data.dart';
 import '../models/game_save.dart';
 import '../services/save_service.dart';
+
 import 'course_selection_screen.dart';
 import 'game_screen.dart';
 
@@ -26,9 +28,19 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
+
     refreshSaves();
+    _startMenuMusic();
   }
 
+  Future<void> _startMenuMusic() async {
+    try {
+      await AudioService.instance.playMenuMusic();
+      debugPrint('Música do menu iniciada.');
+    } catch (error) {
+      debugPrint('Erro ao iniciar música do menu: $error');
+    }
+  }
   // =========================================================
   // ATUALIZAÇÃO DOS SAVES
   // =========================================================
@@ -134,99 +146,104 @@ class _MenuScreenState extends State<MenuScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
       ),
       builder: (sheetContext) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  newGame ? 'Novo jogo' : 'Continuar jogo',
-                  style: const TextStyle(
-                    fontFamily: 'UnifrakturCook',
-                    fontSize: 32,
-                    color: stone,
+        return StatefulBuilder(
+          builder: (sheetContext, setSheetState) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    newGame ? 'Novo jogo' : 'Continuar jogo',
+                    style: const TextStyle(
+                      fontFamily: 'UnifrakturCook',
+                      fontSize: 32,
+                      color: stone,
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 8),
-                const Divider(color: gold),
-                const SizedBox(height: 12),
+                  const SizedBox(height: 8),
+                  const Divider(color: gold),
+                  const SizedBox(height: 12),
 
-                ...List.generate(3, (index) {
-                  final slot = index + 1;
-                  final game = saves[index];
+                  ...List.generate(3, (index) {
+                    final slot = index + 1;
+                    final game = saves[index];
 
-                  final enabled = newGame ? game == null : game != null;
+                    final enabled = newGame ? game == null : game != null;
 
-                  final guildName = game == null
-                      ? 'Slot vazio'
-                      : guilds
-                                .where((g) => g.id == game.guildId)
-                                .map((g) => g.name)
-                                .firstOrNull ??
-                            'Curso desconhecido';
+                    final guildName = game == null
+                        ? 'Slot vazio'
+                        : guilds
+                                  .where((g) => g.id == game.guildId)
+                                  .map((g) => g.name)
+                                  .firstOrNull ??
+                              'Curso desconhecido';
 
-                  return Card(
-                    color: const Color(0xFFD7BD8B),
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9),
-                      side: const BorderSide(color: gold, width: 1.5),
-                    ),
-                    child: ListTile(
-                      enabled: enabled,
-                      leading: Icon(
-                        game == null ? Icons.save_outlined : Icons.castle,
-                        color: stone,
-                        size: 30,
+                    return Card(
+                      color: const Color(0xFFD7BD8B),
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9),
+                        side: const BorderSide(color: gold, width: 1.5),
                       ),
-                      title: Text(
-                        'Save $slot',
-                        style: const TextStyle(
+                      child: ListTile(
+                        enabled: enabled,
+                        leading: Icon(
+                          game == null ? Icons.save_outlined : Icons.castle,
                           color: stone,
-                          fontFamily: 'UnifrakturCook',
-                          fontSize: 23,
+                          size: 30,
                         ),
-                      ),
-                      subtitle: Text(
-                        guildName,
-                        style: const TextStyle(
-                          color: stone,
-                          fontFamily: 'MedievalSharp',
-                        ),
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (game != null)
-                            IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: Colors.red,
-                              ),
-                              tooltip: 'Apagar save',
-                              onPressed: () {
-                                confirmDelete(slot);
-                              },
-                            ),
-                          Icon(
-                            Icons.chevron_right,
-                            color: enabled ? stone : Colors.black26,
+                        title: Text(
+                          'Save $slot',
+                          style: const TextStyle(
+                            color: stone,
+                            fontFamily: 'UnifrakturCook',
+                            fontSize: 23,
                           ),
-                        ],
+                        ),
+                        subtitle: Text(
+                          guildName,
+                          style: const TextStyle(
+                            color: stone,
+                            fontFamily: 'MedievalSharp',
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (game != null)
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red,
+                                ),
+                                tooltip: 'Apagar save',
+                                onPressed: () async {
+                                  await confirmDelete(slot);
+                                  if (mounted) {
+                                    setSheetState(() {});
+                                  }
+                                },
+                              ),
+                            Icon(
+                              Icons.chevron_right,
+                              color: enabled ? stone : Colors.black26,
+                            ),
+                          ],
+                        ),
+                        onTap: enabled
+                            ? () {
+                                Navigator.pop(sheetContext, slot);
+                              }
+                            : null,
                       ),
-                      onTap: enabled
-                          ? () {
-                              Navigator.pop(sheetContext, slot);
-                            }
-                          : null,
-                    ),
-                  );
-                }),
+                    );
+                  }),
 
-                const SizedBox(height: 12),
-              ],
+                  const SizedBox(height: 12),
+                ],
+              ),
             ),
           ),
         );
@@ -438,7 +455,7 @@ class _MenuScreenState extends State<MenuScreen> {
                               const SizedBox(height: 12),
 
                               const Text(
-                                'UESPI OF THRONES',
+                                'uespi_of_thrones',
                                 style: TextStyle(
                                   color: Colors.white54,
                                   fontSize: 10,

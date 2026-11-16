@@ -20,7 +20,15 @@ class AudioService {
   bool get musicEnabled => _musicEnabled;
   bool get effectsEnabled => _effectsEnabled;
 
-  Future<void> initialize() async {
+  Future<void>? _initialization;
+
+  Future<void> initialize() {
+    // Garante que os players sejam configurados uma única vez, mesmo se
+    // menu, jogo e batalha solicitarem áudio quase simultaneamente.
+    return _initialization ??= _configurePlayers();
+  }
+
+  Future<void> _configurePlayers() async {
     await _musicPlayer.setReleaseMode(ReleaseMode.loop);
     await _musicPlayer.setVolume(_musicVolume);
     await _effectsPlayer.setReleaseMode(ReleaseMode.stop);
@@ -28,6 +36,7 @@ class AudioService {
   }
 
   Future<void> _playMusic(String asset) async {
+    await initialize();
     if (!_musicEnabled) return;
     if (_currentMusic == asset && _musicPlayer.state == PlayerState.playing) {
       return;
@@ -49,6 +58,7 @@ class AudioService {
   Future<void> playXpReward() => _playEffect('xp_reward.wav');
 
   Future<void> _playEffect(String asset) async {
+    await initialize();
     if (!_effectsEnabled) return;
 
     // O player de efeitos é separado do player musical.

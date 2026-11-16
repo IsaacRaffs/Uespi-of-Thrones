@@ -387,21 +387,7 @@ class _GuildScreenState extends State<GuildScreen>
 
     if (success) {
       widget.onChanged();
-
       setState(() {});
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: MedievalStyle.stone,
-          content: Text(
-            'Especialização adquirida! Nível ${save.level}.',
-            style: const TextStyle(
-              color: MedievalStyle.parchment,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      );
     }
   }
 

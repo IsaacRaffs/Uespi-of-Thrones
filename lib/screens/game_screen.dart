@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/game_save.dart';
 import '../services/save_service.dart';
+import '../services/audio_service.dart';
 import 'guild_screen.dart';
 import 'map_screen.dart';
 import 'book_library_screen.dart';
@@ -24,6 +25,14 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     save = widget.gameSave;
+    AudioService.instance.playExplorationMusic();
+  }
+
+  @override
+  void dispose() {
+    // Ao sair da partida e voltar ao menu, restaura a música do menu.
+    AudioService.instance.playMenuMusic();
+    super.dispose();
   }
 
   Future<void> saveProgress() async {

@@ -6,6 +6,10 @@ import '../models/guild.dart';
 class BattleService {
   final List<BattleUnit> units = [];
 
+  Timer? _timer;
+
+  bool get isRunning => _timer?.isActive ?? false;
+
   void attack({
     required Guild attacker,
     required Guild target,
@@ -20,8 +24,6 @@ class BattleService {
           start: attacker.location,
           destination: target.location,
           color: attacker.color,
-
-          // Faz as unidades saírem em momentos ligeiramente diferentes.
           progress: -(i * 0.03),
         ),
       );
@@ -29,7 +31,9 @@ class BattleService {
   }
 
   void start({required void Function() onUpdate, required List<Guild> guilds}) {
-    Timer.periodic(const Duration(milliseconds: 50), (_) {
+    if (_timer?.isActive ?? false) return;
+
+    _timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
       final arrivedUnits = <BattleUnit>[];
 
       for (final unit in units) {
@@ -42,16 +46,33 @@ class BattleService {
       }
 
       for (final unit in arrivedUnits) {
-        final target = guilds.firstWhere(
+        final targetIndex = guilds.indexWhere(
           (guild) => guild.id == unit.targetGuildId,
         );
 
-        target.health -= 10;
+        if (targetIndex != -1) {
+          guilds[targetIndex].health -= 10;
+        }
 
         units.remove(unit);
       }
 
       onUpdate();
+
+      if (units.isEmpty) {
+        timer.cancel();
+        _timer = null;
+      }
     });
+  }
+
+  void stop() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  void dispose() {
+    stop();
+    units.clear();
   }
 }

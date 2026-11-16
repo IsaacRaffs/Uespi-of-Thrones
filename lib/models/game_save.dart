@@ -7,6 +7,7 @@ class GameSave {
 
   int level;
   int experience;
+  int clickXp;
 
   int literatura;
   int exatas;
@@ -15,11 +16,20 @@ class GameSave {
 
   int coins;
   int books;
-  int bookshelves;
-  int shoes;
   int health;
 
+  int xpPerClick;
+  int hints;
+  int guildKnowledge;
   List<String> defeatedGuildIds;
+
+  /// IDs das guildas cujos livros foram comprados.
+  /// Mantém a aquisição persistida por partida.
+  List<String> ownedBookGuildIds;
+
+  // Guarda os IDs das perguntas cujas dicas já foram liberadas.
+  // A chave é o ID da guilda.
+  Map<String, List<String>> hintedQuestions;
 
   GameSave({
     required this.slot,
@@ -28,17 +38,23 @@ class GameSave {
     required this.updatedAt,
     this.level = 1,
     this.experience = 0,
-    this.literatura = 1,
-    this.exatas = 1,
-    this.natureza = 1,
-    this.humanas = 1,
+    this.clickXp = 1,
+    this.literatura = 50,
+    this.exatas = 50,
+    this.natureza = 50,
+    this.humanas = 50,
     this.coins = 0,
     this.books = 0,
-    this.bookshelves = 0,
-    this.shoes = 0,
     this.health = 1000,
+    this.xpPerClick = 1,
+    this.hints = 0,
+    this.guildKnowledge = 0,
     List<String>? defeatedGuildIds,
-  }) : defeatedGuildIds = defeatedGuildIds ?? [];
+    List<String>? ownedBookGuildIds,
+    Map<String, List<String>>? hintedQuestions,
+  }) : defeatedGuildIds = defeatedGuildIds ?? [],
+       ownedBookGuildIds = ownedBookGuildIds ?? [],
+       hintedQuestions = hintedQuestions ?? {};
 
   Map<String, dynamic> toJson() {
     return {
@@ -48,37 +64,61 @@ class GameSave {
       'updatedAt': updatedAt.toIso8601String(),
       'level': level,
       'experience': experience,
+      'clickXp': clickXp,
       'literatura': literatura,
       'exatas': exatas,
       'natureza': natureza,
       'humanas': humanas,
       'coins': coins,
       'books': books,
-      'bookshelves': bookshelves,
-      'shoes': shoes,
       'health': health,
       'defeatedGuildIds': defeatedGuildIds,
+      'ownedBookGuildIds': ownedBookGuildIds,
+      'hintedQuestions': hintedQuestions,
+      'xpPerClick': xpPerClick,
+      'hints': hints,
+      'guildKnowledge': guildKnowledge,
     };
   }
 
   factory GameSave.fromJson(Map<String, dynamic> json) {
+    // Migração dos saves antigos: os atributos anteriores
+    // tinham escala de 1 a 7. Multiplicamos por 10.
+    int readAttribute(String key) {
+      final value = (json[key] as num?)?.toInt() ?? 50;
+
+      if (value <= 7) {
+        return (value * 10).clamp(10, 70);
+      }
+
+      return value.clamp(0, 100);
+    }
+
+    final rawHints = json['hintedQuestions'] as Map<String, dynamic>? ?? {};
+
     return GameSave(
-      slot: json['slot'] as int,
+      slot: (json['slot'] as num).toInt(),
       guildId: json['guildId'] as String,
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
-      level: json['level'] as int? ?? 1,
-      experience: json['experience'] as int? ?? 0,
-      literatura: json['literatura'] as int? ?? 1,
-      exatas: json['exatas'] as int? ?? 1,
-      natureza: json['natureza'] as int? ?? 1,
-      humanas: json['humanas'] as int? ?? 1,
-      coins: json['coins'] as int? ?? 0,
-      books: json['books'] as int? ?? 0,
-      bookshelves: json['bookshelves'] as int? ?? 0,
-      shoes: json['shoes'] as int? ?? 0,
-      health: json['health'] as int? ?? 1000,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      level: (json['level'] as num?)?.toInt() ?? 1,
+      experience: (json['experience'] as num?)?.toInt() ?? 0,
+      clickXp: (json['clickXp'] as num?)?.toInt() ?? 1,
+      literatura: readAttribute('literatura'),
+      exatas: readAttribute('exatas'),
+      xpPerClick: json['xpPerClick'] as int? ?? 1,
+      hints: json['hints'] as int? ?? 0,
+      guildKnowledge: json['guildKnowledge'] as int? ?? 0,
+      natureza: readAttribute('natureza'),
+      humanas: readAttribute('humanas'),
+      coins: (json['coins'] as num?)?.toInt() ?? 0,
+      books: (json['books'] as num?)?.toInt() ?? 0,
+      health: (json['health'] as num?)?.toInt() ?? 1000,
       defeatedGuildIds: List<String>.from(json['defeatedGuildIds'] ?? []),
+      ownedBookGuildIds: List<String>.from(json['ownedBookGuildIds'] ?? []),
+      hintedQuestions: rawHints.map(
+        (key, value) => MapEntry(key, List<String>.from(value as List)),
+      ),
     );
   }
 }

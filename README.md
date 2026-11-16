@@ -1,6 +1,6 @@
-# 🏰 UESPI of Thrones
+# 🏰 uespi_of_thrones
 
-**UESPI of Thrones** é um jogo RPG multiplayer baseado em localização, desenvolvido em **Flutter/Dart**, no qual jogadores participam de guildas distribuídas pelo mapa de **Teresina — PI**.
+**uespi_of_thrones** é um jogo RPG multiplayer baseado em localização, desenvolvido em **Flutter/Dart**, no qual jogadores participam de guildas distribuídas pelo mapa de **Teresina — PI**.
 
 As guildas controlam pontos do mapa, recebem recompensas diariamente, acumulam recursos e podem atacar outras guildas. Durante uma batalha, unidades representadas por pequenas esferas coloridas percorrem o mapa em tempo real da guilda atacante até a guilda adversária.
 
@@ -581,7 +581,7 @@ O servidor deve determinar:
 
 # 🎯 Objetivo
 
-O objetivo do **UESPI of Thrones** é combinar elementos de:
+O objetivo do **uespi_of_thrones** é combinar elementos de:
 
 - RPG;
 - estratégia;
@@ -607,6 +607,6 @@ Exemplos:
 
 ---
 
-# 🏰 UESPI of Thrones
+# 🏰 uespi_of_thrones
 
 > **Conquiste territórios. Fortaleça sua guilda. Domine Teresina.**

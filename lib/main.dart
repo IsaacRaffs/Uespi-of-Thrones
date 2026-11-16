@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
 import 'screens/menu_screen.dart';
+import 'services/audio_service.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await AudioService.instance.initialize();
+    debugPrint('AudioService inicializado com sucesso.');
+  } catch (error) {
+    debugPrint('Erro ao inicializar AudioService: $error');
+  }
+
   runApp(const UespiOfThrones());
 }
 

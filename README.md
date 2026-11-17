@@ -1,478 +1,115 @@
-# 🏰 uespi_of_thrones
+# 🏰 UESPI of Thrones
 
-**uespi_of_thrones** é um jogo RPG multiplayer baseado em localização, desenvolvido em **Flutter/Dart**, no qual jogadores participam de guildas distribuídas pelo mapa de **Teresina — PI**.
+**UESPI of Thrones** é um RPG medieval desenvolvido em Flutter e Dart, inspirado no universo de fantasia medieval e integrado à geografia real de Teresina, Piauí.
 
-As guildas controlam pontos do mapa, recebem recompensas diariamente, acumulam recursos e podem atacar outras guildas. Durante uma batalha, unidades representadas por pequenas esferas coloridas percorrem o mapa em tempo real da guilda atacante até a guilda adversária.
-
-O mapa utiliza dados do **OpenStreetMap**.
+O jogo transforma os cursos da Universidade Estadual do Piauí (UESPI) em guildas, permitindo que o jogador explore o mapa, evolua sua própria guilda, adquira conhecimentos acadêmicos e enfrente desafios relacionados às diferentes áreas do conhecimento.
 
 ---
 
-## 🎮 Conceito do jogo
+## 🎮 Sobre o projeto
 
-Cada jogador pertence a uma guilda localizada fisicamente em algum ponto de Teresina.
+A proposta é unir entretenimento, exploração geográfica e aprendizagem em uma experiência gamificada.
 
-Cada guilda possui:
+Cada curso representa uma guilda com identidade visual, características e desafios próprios. O jogador escolhe sua guilda inicial e começa sua jornada para conquistar o reino.
 
-- 🏰 Uma base no mapa
-- 🎨 Uma cor própria
-- ❤️ Pontos de vida
-- 👥 Membros
-- 🪙 Coins
-- 📚 Livros
-- 🪑 Bancadas de livros
-- 👟 Sapatos
-- ⚔️ Capacidade de atacar outras guildas
+## ✨ Funcionalidades
 
-As guildas recebem recursos diariamente e podem utilizar seus recursos para evoluir e participar de batalhas.
+### 🛡️ Sistema de guildas
+- Escolha de uma guilda inicial.
+- Representação dos cursos da UESPI.
+- Atributos relacionados às áreas do conhecimento.
+- Sistema de evolução e níveis.
+- Melhorias da guilda por meio de cliques.
 
----
+### 🗺️ Mapa interativo
+- Mapa baseado na geografia real de Teresina.
+- Integração com OpenStreetMap.
+- Localização das guildas no mapa.
+- Marcadores personalizados com temática medieval.
+- Identidade visual inspirada em mapas antigos e pergaminhos.
 
-# 🗺️ Mapa
+### ⚔️ Sistema de batalhas
+- Desafios contra guildas adversárias.
+- Perguntas relacionadas ao curso de cada guilda.
+- Três questões por batalha.
+- Necessidade de acertar pelo menos duas questões para vencer.
+- Sistema de tempo para responder.
+- Recompensas por vitórias.
 
-A principal interface do jogo é um mapa de **Teresina — Piauí**.
+### 📚 Biblioteca Real
+- Compra de livros utilizando moedas do jogo.
+- Livros associados às guildas.
+- Desbloqueio de conteúdos acadêmicos e questões.
+- Sistema de aquisição permanente dos livros.
 
-Cada guilda aparece como um marcador no mapa.
+### 📈 Progressão
+- Sistema de experiência (XP).
+- Evolução de níveis.
+- Recompensas em moedas.
+- Sistema de melhorias e desenvolvimento da guilda.
 
-Exemplo:
+### 💾 Sistema de salvamento
+- Suporte para até três slots de salvamento.
+- Continuação de partidas anteriores.
+- Persistência do progresso do jogador.
 
-```text
-                    🏰 Guilda Roxa
-                         │
-                         │
-                    🟣 🟣 🟣
-                            ↘
-                              🟣
-                                🟣
-
-🏰 Guilda Azul ───────────────────── 🏰 Guilda Verde
-
-
-                       🔴
-                    🔴
-                 🔴
-              ↗
-
-        🏰 Guilda Vermelha
-```
-
-O mapa é implementado utilizando:
-
-- OpenStreetMap
-- flutter_map
-- latlong2
-
----
-
-# ⚔️ Sistema de batalhas
-
-As guildas podem atacar outras guildas existentes no mapa.
-
-Cada guilda possui uma cor própria.
-
-Por exemplo:
-
-```text
-Dragões do Pirajá
-Cor: 🔴 Vermelho
-
-Lobos de Teresina
-Cor: 🔵 Azul
-```
-
-Quando uma batalha começa, pequenas unidades saem da guilda atacante em direção à guilda adversária.
-
-```text
-🏰 Guilda Vermelha
-
-🔴
-   🔴
-      🔴
-         🔴
-            🔴
-               🔴
-                  ↓
-
-             🏰 Guilda Azul
-```
-
-A posição das unidades é atualizada durante o percurso.
-
-Cada unidade possui um progresso entre:
-
-```text
-0.00 → saiu da guilda
-
-0.25 → percorreu 25%
-
-0.50 → percorreu metade do caminho
-
-0.75 → percorreu 75%
-
-1.00 → chegou à guilda adversária
-```
-
-Quando uma unidade chega ao destino, ela pode causar dano à guilda inimiga.
-
-Exemplo:
-
-```text
-Guilda Azul
-
-❤️ 1000 HP
-
-15 unidades chegam
-10 de dano por unidade
-
-15 × 10 = 150
-
-❤️ 850 HP
-```
-
-O sistema de combate é inspirado no conceito de unidades avançando em direção à base adversária presente em jogos como Clash Royale, mas com mecânicas, unidades e identidade visual próprias.
+### 🎵 Sistema de áudio
+- Música do menu principal.
+- Música durante a exploração.
+- Música durante as batalhas.
+- Efeitos sonoros de interação.
+- Efeito sonoro especial para obtenção de experiência.
 
 ---
 
-# 🎁 Recompensas diárias
-
-Cada guilda recebe recompensas diariamente.
-
-Exemplo:
-
-```text
-Recompensa diária
-
-🪙 +100 Coins
-📚 +2 Livros
-🪑 +1 Bancada
-👟 +1 Sapato
-```
-
-Esses valores podem futuramente depender de fatores como:
-
-- quantidade de membros;
-- nível da guilda;
-- territórios controlados;
-- batalhas vencidas;
-- ranking;
-- missões;
-- eventos especiais.
-
-Em uma versão multiplayer, as recompensas devem ser calculadas pelo servidor para impedir manipulações pelo cliente.
-
----
-
-# 🏰 Guildas
-
-Uma guilda possui informações como:
-
-```text
-Guild
-│
-├── ID
-├── Nome
-├── Localização
-│   ├── Latitude
-│   └── Longitude
-│
-├── Cor
-├── Vida
-│
-├── Recursos
-│   ├── Coins
-│   ├── Livros
-│   ├── Bancadas
-│   └── Sapatos
-│
-└── Membros
-```
-
-Exemplo:
-
-```text
-🏰 Dragões do Pirajá
-
-❤️ Vida: 1000
-
-🪙 Coins: 1500
-📚 Livros: 32
-🪑 Bancadas: 12
-👟 Sapatos: 8
-```
-
----
-
-# 📂 Estrutura do projeto
-
-```text
-uespi_of_thrones/
-│
-├── lib/
-│   │
-│   ├── main.dart
-│   │
-│   ├── models/
-│   │   ├── guild.dart
-│   │   ├── guild_item.dart
-│   │   └── battle_unit.dart
-│   │
-│   ├── data/
-│   │   └── guild_data.dart
-│   │
-│   ├── services/
-│   │   ├── reward_service.dart
-│   │   └── battle_service.dart
-│   │
-│   ├── screens/
-│   │   ├── map_screen.dart
-│   │   ├── guild_screen.dart
-│   │   └── battle_screen.dart
-│   │
-│   └── widgets/
-│       ├── guild_marker.dart
-│       └── battle_ball.dart
-│
-├── android/
-├── ios/
-├── web/
-│
-├── pubspec.yaml
-└── README.md
-```
-
----
-
-# 🧱 Arquitetura
-
-O projeto utiliza uma separação simples entre responsabilidades.
-
-### Models
-
-Representam as entidades do jogo.
-
-```text
-models/
-├── guild.dart
-├── guild_item.dart
-└── battle_unit.dart
-```
-
-### Data
-
-Contém dados utilizados pelo jogo durante o desenvolvimento.
-
-```text
-data/
-└── guild_data.dart
-```
-
-Posteriormente esses dados deverão vir do backend.
-
-### Services
-
-Contêm as regras do jogo.
-
-```text
-services/
-├── reward_service.dart
-└── battle_service.dart
-```
-
-Por exemplo:
-
-- iniciar ataques;
-- movimentar unidades;
-- calcular dano;
-- distribuir recompensas.
-
-### Screens
-
-Contêm as telas principais.
-
-```text
-screens/
-├── map_screen.dart
-├── guild_screen.dart
-└── battle_screen.dart
-```
-
-### Widgets
-
-Componentes visuais reutilizáveis.
-
-```text
-widgets/
-├── guild_marker.dart
-└── battle_ball.dart
-```
-
----
-
-# 🛠️ Tecnologias
-
-### Frontend
-
-- Flutter
-- Dart
-- Material Design
-
-### Mapas
-
-- OpenStreetMap
-- flutter_map
-- latlong2
-
-### Futuro backend
-
-Uma arquitetura multiplayer poderá utilizar:
-
-- FastAPI
-- PostgreSQL
-- WebSocket
-- JWT
-- Docker
-
----
-
-# 🌐 Arquitetura multiplayer
-
-A versão completa deverá utilizar um servidor central.
-
-```text
-                    ┌────────────────────┐
-                    │      Backend       │
-                    │                    │
-                    │ FastAPI / WebSocket│
-                    │     PostgreSQL     │
-                    └─────────┬──────────┘
-                              │
-                         WebSocket
-                              │
-              ┌───────────────┼───────────────┐
-              │               │               │
-              ▼               ▼               ▼
-
-          📱 Jogador A    📱 Jogador B    📱 Jogador C
-              │               │               │
-              └───────────────┼───────────────┘
-                              │
-                              ▼
-                       🗺️ Teresina - PI
-```
-
-O backend será responsável por manter o estado oficial do jogo.
-
-Isso inclui:
-
-- usuários;
-- guildas;
-- membros;
-- inventários;
-- recursos;
-- recompensas;
-- batalhas;
-- dano;
-- ranking;
-- territórios;
-- histórico de batalhas.
-
-O aplicativo Flutter será responsável principalmente pela interface e pela representação visual dessas informações.
-
----
-
-# 🔴 Batalhas em tempo real
-
-Para batalhas multiplayer, o servidor poderá utilizar **WebSockets**.
-
-Quando uma guilda iniciar um ataque:
-
-```text
-Jogador
-   │
-   │ atacar
-   ▼
-Backend
-   │
-   ├── valida ataque
-   ├── cria batalha
-   ├── cria unidades
-   └── envia evento WebSocket
-             │
-             ▼
-      Jogadores conectados
-```
-
-Todos os jogadores que estiverem visualizando aquela região poderão receber o evento.
-
-Exemplo:
-
-```json
-{
-  "type": "battle_started",
-  "attacker": "guild_1",
-  "target": "guild_2",
-  "units": 15
-}
-```
-
-O Flutter então poderá representar visualmente as unidades percorrendo o mapa.
-
----
-
-# 🗃️ Banco de dados
-
-Uma possível estrutura inicial seria:
-
-```text
-users
-guilds
-guild_members
-items
-guild_inventory
-daily_rewards
-battles
-battle_units
-battle_history
-```
-
-Relacionamento simplificado:
-
-```text
-User
-  │
-  ▼
-GuildMember
-  │
-  ▼
-Guild
-  │
-  ├──────── GuildInventory
-  │
-  └──────── Battle
-               │
-               ▼
-           BattleUnit
-```
-
----
-
-# 🚀 Executando o projeto
-
-É necessário possuir o Flutter instalado.
-
-Verifique a instalação:
+## 🏰 Guildas disponíveis
+
+O jogo possui 15 guildas, representando cursos da UESPI:
+
+| Guilda | Área relacionada |
+|---|---|
+| Psicologia | Humanas |
+| Engenharia Civil | Exatas |
+| Engenharia Elétrica | Exatas |
+| Zootecnia | Natureza |
+| História | Humanas |
+| Medicina | Natureza |
+| Física | Exatas |
+| Educação Física | Natureza |
+| Computação | Exatas |
+| Química | Natureza |
+| Letras | Literatura |
+| Biologia | Natureza |
+| Direito | Humanas |
+| Jornalismo | Humanas |
+| Turismo | Humanas |
+
+## 🧰 Tecnologias utilizadas
+
+- **Dart:** linguagem de programação.
+- **Flutter:** framework de desenvolvimento multiplataforma.
+- **OpenStreetMap:** dados geográficos utilizados no mapa.
+- **flutter_map:** integração e renderização do mapa.
+- **Git:** controle de versão.
+
+## 🚀 Como executar o projeto
+
+### Pré-requisitos
+
+- Flutter SDK instalado.
+- Dart SDK.
+- Git.
+- Ambiente de desenvolvimento compatível com Flutter.
+
+### Instalação
+
+Clone o repositório:
 
 ```bash
-flutter doctor
+git clone URL_DO_REPOSITORIO
 ```
 
-Clone o projeto:
-
-```bash
-git clone <URL_DO_REPOSITORIO>
-```
-
-Entre na pasta:
+Entre na pasta do projeto:
 
 ```bash
 cd uespi_of_thrones
@@ -484,129 +121,48 @@ Instale as dependências:
 flutter pub get
 ```
 
-Execute:
+Execute o aplicativo:
 
 ```bash
 flutter run
 ```
 
-Para executar no navegador:
+Para executar a versão Linux:
 
 ```bash
-flutter run -d chrome
+flutter run -d linux
 ```
 
----
+### Gerar APK
 
-# 📦 Dependências principais
+Para gerar o aplicativo Android:
 
-Exemplo do `pubspec.yaml`:
-
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-
-  flutter_map: ^8.2.2
-  latlong2: ^0.9.1
+```bash
+flutter build apk --release
 ```
 
----
-
-# 🗺️ OpenStreetMap
-
-O projeto utiliza o OpenStreetMap como fonte de dados geográficos.
-
-Durante o desenvolvimento, o mapa pode utilizar:
+O APK será gerado em:
 
 ```text
-https://tile.openstreetmap.org/{z}/{x}/{y}.png
+build/app/outputs/flutter-apk/app-release.apk
 ```
 
-A atribuição aos colaboradores do OpenStreetMap deve permanecer visível na aplicação.
+---
 
-Para uma aplicação em produção com muitos usuários, deverá ser utilizado um serviço de tiles adequado à carga esperada e às políticas do provedor escolhido.
+## 🎨 Identidade visual
+
+O projeto utiliza uma identidade visual medieval, com elementos como:
+
+- Pergaminhos e mapas antigos.
+- Brasões e bandeiras.
+- Castelos e símbolos de guildas.
+- Tipografia inspirada na estética medieval.
+- Paleta de cores baseada em tons de dourado, marrom e sépia.
+
+## 🎯 Objetivo
+
+O objetivo do UESPI of Thrones é desenvolver uma experiência de RPG que conecte o ambiente universitário ao universo dos jogos, incentivando a exploração, a evolução do jogador e o contato com conhecimentos acadêmicos.
 
 ---
 
-# 🔐 Segurança
-
-Em uma versão multiplayer, informações importantes nunca devem ser controladas exclusivamente pelo aplicativo Flutter.
-
-O servidor deverá validar ações como:
-
-```text
-❌ Flutter decide:
-
-"Ganhei 10000 coins"
-
-
-✅ Flutter solicita:
-
-"Quero coletar minha recompensa diária"
-
-        ↓
-
-Servidor verifica
-
-        ↓
-
-Última recompensa:
-06/10/2026 08:00
-
-Data atual:
-07/10/2026 08:00
-
-        ↓
-
-Recompensa permitida
-
-        ↓
-
-+100 coins
-```
-
-A mesma lógica deverá ser aplicada às batalhas.
-
-O servidor deve determinar:
-
-- se o ataque é permitido;
-- quantas unidades podem ser enviadas;
-- quanto dano foi causado;
-- quais recursos foram perdidos;
-- quem venceu;
-- quais recompensas foram recebidas.
-
----
-
-# 🎯 Objetivo
-
-O objetivo do **uespi_of_thrones** é combinar elementos de:
-
-- RPG;
-- estratégia;
-- geolocalização;
-- guildas;
-- gerenciamento de recursos;
-- batalhas multiplayer;
-- exploração do mapa real.
-
-O mapa de **Teresina — PI** funciona como o mundo do jogo, transformando diferentes locais da cidade em pontos estratégicos para as guildas.
-
----
-
-# 📜 Licença
-
-Defina a licença do projeto antes da distribuição pública.
-
-Exemplos:
-
-- MIT
-- Apache 2.0
-- GPL-3.0
-
----
-
-# 🏰 uespi_of_thrones
-
-> **Conquiste territórios. Fortaleça sua guilda. Domine Teresina.**
+**UESPI of Thrones — Conquiste conhecimento. Evolua sua guilda. Domine o reino.**

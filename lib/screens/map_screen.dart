@@ -12,6 +12,7 @@ import '../widgets/battle_ball.dart';
 import '../widgets/guild_marker.dart';
 import '../widgets/medieval_guild_marker.dart';
 import 'battle_quiz_screen.dart';
+import 'golden_diploma_screen.dart';
 import '../data/course_questions.dart';
 import '../services/opponent_service.dart';
 
@@ -79,6 +80,7 @@ class _MapScreenState extends State<MapScreen> {
     final targetLevel = getTargetLevel(target);
     final isDefeated = save.defeatedGuildIds.contains(target.id);
     final isNext = nextOpponent?.id == target.id;
+    final canDuelByLevel = save.level >= targetLevel;
 
     showModalBottomSheet(
       context: context,
@@ -188,6 +190,12 @@ class _MapScreenState extends State<MapScreen> {
                     'Derrote a fortaleza anterior para avançar.',
                     const Color(0xFF922F2F),
                   )
+                else if (!canDuelByLevel)
+                  _battleMessage(
+                    'NÍVEL INSUFICIENTE',
+                    'Você precisa alcançar o nível $targetLevel para duelar. Seu nível atual: ${save.level}.',
+                    const Color(0xFF922F2F),
+                  )
                 else
                   _battleMessage(
                     'PRÓXIMO ALVO',
@@ -197,7 +205,7 @@ class _MapScreenState extends State<MapScreen> {
 
                 const SizedBox(height: 18),
 
-                if (isNext && !isDefeated)
+                if (isNext && !isDefeated && canDuelByLevel)
                   SizedBox(
                     width: double.infinity,
                     height: 53,
@@ -297,15 +305,27 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> startBattle(Guild target) async {
     if (battling) return;
 
+    final targetLevel = getTargetLevel(target);
+    if (save.level < targetLevel) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Nível insuficiente! Alcance o nível $targetLevel para duelar. (Seu nível: ${save.level})',
+          ),
+        ),
+      );
+      return;
+    }
+
     final next = nextOpponent;
 
     if (next == null || next.id != target.id) {
       return;
     }
 
-    final questions = courseQuestions[target.id];
+    final allQuestions = courseQuestions[target.id];
 
-    if (questions == null || questions.length != 3) {
+    if (allQuestions == null || allQuestions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Não foi possível carregar as perguntas desta guilda.'),
@@ -313,6 +333,16 @@ class _MapScreenState extends State<MapScreen> {
       );
       return;
     }
+
+    // A primeira batalha começa com 3 perguntas. Cada guilda inimiga
+    // conquistada acrescenta uma pergunta à próxima batalha, até 16.
+    final defeatedEnemyCount = gameGuilds
+        .where((guild) => guild.id != save.guildId)
+        .where((guild) => save.defeatedGuildIds.contains(guild.id))
+        .length;
+    final questionCount = (3 + defeatedEnemyCount).clamp(3, 16).toInt();
+    final questions = allQuestions.take(questionCount).toList();
+    final requiredCorrect = (questions.length * 2 + 2) ~/ 3;
 
     setState(() {
       battling = true;
@@ -339,30 +369,52 @@ class _MapScreenState extends State<MapScreen> {
     });
 
     if (victory == true) {
-      if (!save.defeatedGuildIds.contains(target.id)) {
+      final alreadyDefeated = save.defeatedGuildIds.contains(target.id);
+
+      if (!alreadyDefeated) {
         save.defeatedGuildIds.add(target.id);
         save.coins += 100 * getTargetLevel(target);
       }
 
+      // A guilda do jogador não entra na contagem: são 14 adversárias.
+      final enemyGuilds = gameGuilds.where((guild) => guild.id != save.guildId);
+      final conqueredAllGuilds = enemyGuilds.every(
+        (guild) => save.defeatedGuildIds.contains(guild.id),
+      );
+      final earnedDiploma = conqueredAllGuilds && !save.hasGoldenDiploma;
+
+      if (earnedDiploma) {
+        save.hasGoldenDiploma = true;
+      }
+
+      // Persiste a vitória, a recompensa em coins e a conquista no mesmo save.
       await widget.onChanged();
 
       if (!mounted) return;
 
-      showResult(
-        title: 'VITÓRIA!',
-        message:
-            'Você conquistou ${target.name}!\n\n'
-            'Você acertou pelo menos duas perguntas.\n'
-            'Recompensa: ${100 * getTargetLevel(target)} coins.\n\n'
-            'A próxima guilda já está disponível!',
-        victory: true,
-      );
+      if (earnedDiploma) {
+        await showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const GoldenDiplomaScreen(),
+        );
+      } else {
+        showResult(
+          title: 'VITÓRIA!',
+          message:
+              'Você conquistou ${target.name}!\n\n'
+              'Você acertou pelo menos $requiredCorrect das ${questions.length} perguntas.\n'
+              '${alreadyDefeated ? 'Esta guilda já havia sido conquistada.' : 'Recompensa: ${100 * getTargetLevel(target)} coins.'}\n\n'
+              '${conqueredAllGuilds ? 'Todas as guildas foram conquistadas!' : 'A próxima guilda já está disponível!'}',
+          victory: true,
+        );
+      }
     } else if (victory == false) {
       showResult(
         title: 'DERROTA!',
         message:
             'Você não conseguiu conquistar ${target.name}.\n\n'
-            'É necessário acertar pelo menos duas das três perguntas.\n\n'
+            'É necessário acertar pelo menos $requiredCorrect das ${questions.length} perguntas.\n\n'
             'Treine e tente novamente!',
         victory: false,
       );

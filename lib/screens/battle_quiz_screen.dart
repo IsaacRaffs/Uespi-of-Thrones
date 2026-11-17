@@ -46,11 +46,17 @@ class _BattleQuizScreenState extends State<BattleQuizScreen> {
 
   Timer? countdownTimer;
 
-  int remainingSeconds = 10;
+  int remainingSeconds = 15;
 
-  final List<int> questionTimes = [10, 7, 5];
+  // A prova fica gradualmente mais exigente: as primeiras perguntas
+  // oferecem mais tempo e, a partir da sétima, o limite é de 5 segundos.
+  static const List<int> _initialQuestionTimes = [15, 12, 10, 9, 8, 7];
 
-  int get questionTime => questionTimes[currentQuestion];
+  int get questionTime => currentQuestion < _initialQuestionTimes.length
+      ? _initialQuestionTimes[currentQuestion]
+      : 5;
+
+  int get requiredCorrectAnswers => (widget.questions.length * 2 + 2) ~/ 3;
 
   @override
   void initState() {
@@ -92,8 +98,6 @@ class _BattleQuizScreenState extends State<BattleQuizScreen> {
   void answer(int index) {
     if (answered) return;
 
-    AudioService.instance.playClick();
-
     countdownTimer?.cancel();
 
     final question = widget.questions[currentQuestion];
@@ -113,8 +117,6 @@ class _BattleQuizScreenState extends State<BattleQuizScreen> {
   void nextQuestion() {
     if (!answered) return;
 
-    AudioService.instance.playClick();
-
     if (currentQuestion < widget.questions.length - 1) {
       setState(() {
         currentQuestion++;
@@ -127,7 +129,7 @@ class _BattleQuizScreenState extends State<BattleQuizScreen> {
     } else {
       countdownTimer?.cancel();
 
-      Navigator.pop(context, correctAnswers >= 2);
+      Navigator.pop(context, correctAnswers >= requiredCorrectAnswers);
     }
   }
 
@@ -244,7 +246,7 @@ class _BattleQuizScreenState extends State<BattleQuizScreen> {
               ),
             ),
             Text(
-              'PERGUNTA ${currentQuestion + 1}/3',
+              'PERGUNTA ${currentQuestion + 1}/${widget.questions.length}',
               style: const TextStyle(
                 color: _BattleColors.parchment,
                 fontSize: 11,
@@ -255,7 +257,7 @@ class _BattleQuizScreenState extends State<BattleQuizScreen> {
         ),
         const SizedBox(height: 8),
         Row(
-          children: List.generate(3, (index) {
+          children: List.generate(widget.questions.length, (index) {
             final completed = index < currentQuestion;
             final active = index == currentQuestion;
 

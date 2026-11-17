@@ -46,6 +46,7 @@ class ProgressionService {
 
       case 'xp':
         save.xpPerClick++;
+        save.clickXp = save.xpPerClick;
         break;
 
       case 'hints':
@@ -55,7 +56,7 @@ class ProgressionService {
       case 'knowledge':
         if (save.guildKnowledge >= 100) return false;
 
-        save.guildKnowledge = (save.guildKnowledge + 5).clamp(0, 100);
+        save.guildKnowledge = (save.guildKnowledge + 5).clamp(0, 100).toInt();
         break;
 
       default:

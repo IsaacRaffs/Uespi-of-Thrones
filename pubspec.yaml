@@ -64,7 +64,8 @@ flutter:
     - assets/images/guilds/
     - assets/images/uespi_logo_transparente.png
     - assets/images/background_menu.png
-
+    - assets/images/golden_diploma.png
+    
   fonts:
     - family: UnifrakturCook
       fonts:
